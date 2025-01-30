@@ -1,9 +1,7 @@
-import React from 'react'
+import React from 'react';
 
 const DailyNorma = () => {
-  return (
-    <div>DailyNorma</div>
-  )
-}
+  return <div>DailyNorma</div>;
+};
 
-export default DailyNorma
+export default DailyNorma;
