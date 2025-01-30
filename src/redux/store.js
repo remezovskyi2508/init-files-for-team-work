@@ -11,15 +11,15 @@ import {
 } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 
-import contactsReducer from './contacts/slice';
-import filtersReducer from './filters/slice';
+// import contactsReducer from './contacts/slice';
+// import filtersReducer from './filters/slice';
 import authReducer from './auth/slice';
 
-const contactConfig = {
-  key: 'contactsData',
-  storage,
-  whitelist: ['contacts'],
-};
+// const contactConfig = {
+//   key: 'contactsData',
+//   storage,
+//   whitelist: ['contacts'],
+// };
 
 const authConfig = {
   key: 'auth',
@@ -28,8 +28,8 @@ const authConfig = {
 };
 
 const rootReducer = combineReducers({
-  contacts: persistReducer(contactConfig, contactsReducer),
-  filters: filtersReducer,
+  // contacts: persistReducer(contactConfig, contactsReducer),
+  // filters: filtersReducer,
   auth: persistReducer(authConfig, authReducer),
 });
 

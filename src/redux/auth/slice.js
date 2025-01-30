@@ -1,93 +1,82 @@
 import { createSlice } from '@reduxjs/toolkit';
-import {
-  fetchContacts,
-  addContact,
-  deleteContact,
-  editContact,
-} from './operations';
+import { login, logout, refreshUser, register } from './operations';
 
-const contactsSlice = createSlice({
-  name: 'name',
-  initialState: {
-    items: [],
-    loading: false,
-    error: null,
-    isOpen: false,
-    isClose: true,
+const initialState = {
+  user: {
+    name: null,
+    email: null,
   },
-  reducers: {
-    openModal: (state, action) => {
-      state.isOpen = true;
-      state.isClose = false;
-      state.modalId = action.payload;
-    },
-    closeModal: state => {
-      state.isOpen = false;
-      state.isClose = true;
-      state.modalId = null;
-    }
-  },
+  token: null,
+  error: null,
+  loading: false,
+  isLoggedIn: true,
+  isRefreshing: false,
+};
+
+const authSlice = createSlice({
+  name: 'auth',
+  initialState,
   extraReducers: builder => {
     builder
-      .addCase(fetchContacts.pending, state => {
+      .addCase(register.pending, state => {
         state.loading = true;
-      })
-      .addCase(fetchContacts.fulfilled, (state, action) => {
-        state.loading = false;
         state.error = null;
-        state.items = action.payload;
       })
-      .addCase(fetchContacts.rejected, (state, action) => {
+      .addCase(register.fulfilled, (state, action) => {
+        state.loading = false;
+        state.isLoggedIn = true;
+        state.error = null;
+        state.token = action.payload.token;
+        state.user = action.payload.user;
+      })
+      .addCase(register.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
-      .addCase(addContact.pending, state => {
+      .addCase(login.pending, state => {
         state.loading = true;
+        state.error = null;
       })
-      .addCase(addContact.fulfilled, (state, action) => {
+      .addCase(login.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
-        state.items.push(action.payload);
+        state.isLoggedIn = true;
+        state.token = action.payload.token;
+        state.user = action.payload.user;
       })
-      .addCase(addContact.rejected, (state, action) => {
+      .addCase(login.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
-      .addCase(deleteContact.pending, state => {
+      .addCase(logout.pending, state => {
         state.loading = true;
-      })
-      .addCase(deleteContact.fulfilled, (state, action) => {
-        state.loading = false;
+        state.isRefreshing = true;
         state.error = null;
-        state.items = state.items.filter(item => item.id !== action.payload.id);
       })
-      .addCase(deleteContact.rejected, (state, action) => {
+      .addCase(logout.fulfilled, () => {
+        return initialState;
+      })
+      .addCase(logout.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
-      .addCase(editContact.pending, state => {
+      .addCase(refreshUser.pending, state => {
+        state.isRefreshing = true;
         state.loading = true;
-      })
-      .addCase(editContact.fulfilled, (state, action) => {
-        state.loading = false;
         state.error = null;
-        const index = state.items.findIndex(
-          item => item.id === action.payload.id
-        );
-        if (index !== -1) {
-          state.items[index] = action.payload;
-          state.isOpenEditor = false;
-          state.editorId = null;
-        }
       })
-      .addCase(editContact.rejected, (state, action) => {
+      .addCase(refreshUser.fulfilled, (state, action) => {
+        state.isRefreshing = false;
+        state.isLoggedIn = true;
+        state.loading = false;
+        state.user = action.payload;
+      })
+      .addCase(refreshUser.rejected, (state, action) => {
+        state.isRefreshing = false;
         state.loading = false;
         state.error = action.payload;
       });
   },
 });
 
-export const { openModal, closeModal, acceptAction, openEditor, closeEditor } =
-  contactsSlice.actions;
-
-export default contactsSlice.reducer;
+export default authSlice.reducer;
